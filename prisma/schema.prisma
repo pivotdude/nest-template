@@ -1,0 +1,65 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Passport {
+  id               Int      @id @default(autoincrement())
+  serialAndNumber  Int      @unique
+  birthPlace       String
+  dateOfIssue      DateTime
+  issuingAuthority String
+  user             User?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Role {
+  id          Int     @id @default(autoincrement())
+  name        String
+  description String?
+
+  users User[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model User {
+  id          Int       @id @default(autoincrement())
+  FCS         String?
+  email       String    @unique
+  password    String
+  inn         Int?
+  phone       String?
+  dateOfBirth DateTime?
+  workPlace   String?
+  address     String?
+
+  passportId Int?      @unique
+  passport   Passport? @relation(fields: [passportId], references: [id])
+
+  roleId Int  @default(1)
+  Role   Role @relation(fields: [roleId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// User
+// Employee
+// Admin
+
+model sentEmails {
+  id       Int    @id @default(autoincrement())
+  theme    String
+  email    String
+  template String
+  context  Json?
+  data     Json?
+}

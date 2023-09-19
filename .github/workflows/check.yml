@@ -1,0 +1,56 @@
+name: Check
+on: [pull_request]
+jobs:
+#    check:
+#        runs-on: ubuntu-latest
+#        steps:
+#            - name: Checkout
+#              uses: actions/checkout@v3
+#            - name: Yarn install
+#              run: npm i -g yarn
+#            - name: Install dependencies
+#              run: yarn
+#            - name: Lint check
+#              run: yarn lint
+#            - name: Prettier check
+#              run: yarn pr:check
+    test:
+      needs: [ check ]
+      runs-on: ubuntu-latest
+      steps:
+        - name: Checkout
+          uses: actions/checkout@v3
+        - name: Yarn install
+          run: npm i -g yarn
+        - name: Create .env file
+          env:
+            MAIL_URL: ${{ secrets.MAIL_URL }}
+          run: |
+            touch .env
+            echo "MAIL_URL=$MAIL_URL" > .env
+        - name: Install dependencies
+          run: yarn
+        - name: Unit tests
+          run: yarn test
+        - name: e2e tests
+          run: yarn test:e2e
+    buildCheck:
+#      needs: [ check, test ]
+      runs-on: ubuntu-latest
+      steps:
+        - name: Checkout
+          uses: actions/checkout@v3
+        - name: Yarn install
+          run: npm i -g yarn
+        - name: Install dependencies
+          run: yarn
+        - name: Create .env file
+          env:
+            MAIL_URL: ${{ secrets.MAIL_URL }}
+          run: |
+            touch .env
+            echo "MAIL_URL=$MAIL_URL" > .env
+        - name: Build
+          run: yarn build
+        - name: Start
+          run: yarn start
